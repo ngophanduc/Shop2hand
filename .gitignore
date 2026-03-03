@@ -1,0 +1,19 @@
+# Common
+node_modules/
+.vscode/
+.DS_Store
+*.log
+.env
+.env.local
+
+# Build
+dist/
+target/
+
+# IDE
+.idea/
+.classpath
+.project
+.settings/
+*.iml
+bin/
