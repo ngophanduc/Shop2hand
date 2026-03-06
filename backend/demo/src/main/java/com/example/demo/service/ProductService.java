@@ -122,18 +122,24 @@ public class ProductService {
         }
 
         if (imageFiles != null && !imageFiles.isEmpty()) {
-            product.getImages().clear();
-            productImageRepository.deleteByProductId(id); // Ensure old images are deleted if replaced
-            Product finalProduct = product;
-            List<ProductImage> images = imageFiles.parallelStream().map(file -> {
-                try {
-                    String url = cloudinaryService.uploadImage(file);
-                    return ProductImage.builder().product(finalProduct).imageUrl(url).build();
-                } catch (java.io.IOException e) {
-                    throw new RuntimeException("Image upload failed", e);
-                }
-            }).collect(Collectors.toList());
-            product.getImages().addAll(images);
+            List<org.springframework.web.multipart.MultipartFile> validFiles = imageFiles.stream()
+                    .filter(file -> !file.isEmpty())
+                    .collect(Collectors.toList());
+
+            if (!validFiles.isEmpty()) {
+                product.getImages().clear();
+                productImageRepository.deleteByProductId(id);
+                Product finalProduct = product;
+                List<ProductImage> images = validFiles.parallelStream().map(file -> {
+                    try {
+                        String url = cloudinaryService.uploadImage(file);
+                        return ProductImage.builder().product(finalProduct).imageUrl(url).build();
+                    } catch (java.io.IOException e) {
+                        throw new RuntimeException("Image upload failed", e);
+                    }
+                }).collect(Collectors.toList());
+                product.getImages().addAll(images);
+            }
         }
 
         return mapToResponse(productRepository.save(product));

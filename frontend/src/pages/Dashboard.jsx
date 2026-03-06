@@ -151,14 +151,13 @@ const Dashboard = ({ user }) => {
                 status: newStatus
             })], { type: 'application/json' });
             formDataToSend.append('product', productBlob);
-            // Append an empty "files" part to ensure multipart request is complete
-            formDataToSend.append('files', new Blob([], { type: 'application/octet-stream' }), '');
 
             await productService.update(product.id, formDataToSend);
             fetchAllData();
         } catch (error) {
-            console.error('Error toggling sold status', error);
-            alert('Failed to update status: ' + (error.response?.data?.message || error.response?.data?.error || error.message));
+            console.error('Error toggling sold status:', error);
+            const errorMessage = error.response?.data?.message || error.response?.data?.error || error.message;
+            alert(`Failed to update status: ${errorMessage} (Status: ${error.response?.status})`);
         }
     };
 

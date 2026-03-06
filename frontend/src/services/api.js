@@ -2,9 +2,6 @@ import axios from 'axios';
 
 const api = axios.create({
     baseURL: '/api',
-    headers: {
-        'Content-Type': 'application/json',
-    },
 });
 
 api.interceptors.request.use((config) => {
@@ -24,12 +21,8 @@ export const authService = {
 export const productService = {
     getAll: (categoryId, search) => api.get('/products', { params: { categoryId, search } }),
     getById: (id) => api.get(`/products/${id}`),
-    create: (formData) => api.post('/products', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-    }),
-    update: (id, formData) => api.put(`/products/${id}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-    }),
+    create: (formData) => api.post('/products', formData),
+    update: (id, formData) => api.put(`/products/${id}`, formData),
     delete: (id) => api.delete(`/products/${id}`),
     getOne: (id) => api.get(`/products/${id}`),
 };
