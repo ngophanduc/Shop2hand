@@ -70,8 +70,101 @@
         "Bags": "Bags"
     },
     "conditions": {
-        "NEW": "New",
+        "NEW": "New with Tags",
         "LIKE_NEW": "Like New",
-        "USED": "Used"
+        "USED": "Used",
+        "GOOD": "Good / Worn"
+    },
+    "navbar": {
+        "menu": "Menu",
+        "account": "Account",
+        "shop": "Shop",
+        "about_us": "About Us"
+    },
+    "home": {
+        "hero_title": "Rewind. Restyle.",
+        "hero_desc": "Curated vintage and second-hand fashion. Authentic pieces for the modern wardrobe.",
+        "shop_collection": "Shop Collection",
+        "new_arrivals": "New Arrivals",
+        "new_arrivals_desc": "Latest additions to the archive",
+        "view_all": "View All",
+        "view_all_drop": "View All Drop",
+        "vintage": "Vintage",
+        "shop_now": "Shop Now",
+        "streetwear": "Streetwear",
+        "explore": "Explore",
+        "the_archive": "The Archive",
+        "archive_desc": "Discover how we source and curate our unique collections.",
+        "our_story": "Our Story"
+    },
+    "shop": {
+        "title": "Shop The Drop",
+        "pieces_available": "{{count}} curated pieces available",
+        "sort_by": "Sort By",
+        "sort_options": "Sort Options",
+        "sort_newest": "New Arrivals",
+        "sort_price_asc": "Price: Low to High",
+        "sort_price_desc": "Price: High to Low",
+        "condition_rating": "Condition Rating",
+        "any_condition": "Any Condition",
+        "filters_and_sort": "Filters & Sort",
+        "show_items": "Show {{count}} Items",
+        "no_items_title": "No Archive Pieces Found",
+        "no_items_desc": "We couldn't find any items matching those exact filters. Try clearing your search and resetting conditions.",
+        "reset_filters": "Reset All Filters"
+    },
+    "product_detail": {
+        "back": "Back",
+        "fast_delivery": "Fast Delivery",
+        "authentic": "Authentic",
+        "add_to_archive": "Add to Archive",
+        "add_price": "Add - {{price}}",
+        "product_not_found": "Product not found."
+    },
+    "cart": {
+        "title": "Your Archive",
+        "empty": "Cart is empty",
+        "continue_shopping": "Continue Shopping",
+        "order_summary": "Order Summary",
+        "subtotal": "Subtotal ({{count}} items)",
+        "estimated_shipping": "Estimated Shipping",
+        "free": "Free",
+        "taxes": "Taxes",
+        "total": "Total",
+        "secure_checkout": "Secure Checkout",
+        "estimated_total": "Estimated Total",
+        "checkout_now": "Checkout Now"
+    },
+    "footer": {
+        "desc": "Curating the best vintage and second-hand pieces for a sustainable future.",
+        "navigation": "Navigation",
+        "legal": "Legal",
+        "terms": "Terms of Service",
+        "privacy": "Privacy Policy",
+        "returns": "Returns & Exchanges",
+        "social": "Social",
+        "rights": "© 2026 Shop2Hand. All rights reserved."
+    },
+    "about_us": {
+        "hero_title": "The Archive",
+        "hero_desc": "Curated for the modern wardrobe. Discover authentic vintage pieces with a story.",
+        "explore_story": "Explore Our Story",
+        "story_title": "Our Story",
+        "story_desc1": "We started with a simple belief: clothes with pasts have the best futures. Our journey began in local thrift stores, searching for pieces that stood the test of time.",
+        "story_desc2": "Today, we curate a global collection of vintage streetwear, ensuring every item meets our strict standards for quality and authenticity.",
+        "values_title": "Our Core Values",
+        "sustainability": "Sustainability",
+        "sustainability_desc": "Extending the life cycle of quality garments.",
+        "authenticity": "Authenticity",
+        "authenticity_desc": "Strict verification for every piece we sell.",
+        "curation": "Curation",
+        "curation_desc": "Hand-picked items that fit our aesthetic.",
+        "lookbook_title": "Lookbook",
+        "lookbook_desc": "Explore how we style our favorite archive pieces.",
+        "behind_scenes": "Behind the Scenes",
+        "behind_desc": "Get a glimpse into our sourcing trips and curation process.",
+        "cta_title": "Ready to find your unique style?",
+        "cta_desc": "Join thousands of fashion-forward individuals embracing sustainable style. Your next favorite piece is waiting.",
+        "shop_now_btn": "Shop The Archive"
     }
 }

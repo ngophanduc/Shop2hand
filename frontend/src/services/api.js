@@ -19,7 +19,12 @@ export const authService = {
 };
 
 export const productService = {
-    getAll: (categoryId, search) => api.get('/products', { params: { categoryId, search } }),
+    getAll: (categoryId, search) => {
+        const params = {};
+        if (categoryId) params.categoryId = categoryId;
+        if (search) params.search = search;
+        return api.get('/products', { params });
+    },
     getById: (id) => api.get(`/products/${id}`),
     create: (formData) => api.post('/products', formData),
     update: (id, formData) => api.put(`/products/${id}`, formData),

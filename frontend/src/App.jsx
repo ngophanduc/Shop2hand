@@ -6,7 +6,12 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Checkout from './pages/Checkout';
 import OrderSuccess from './pages/OrderSuccess';
+import AboutUs from './pages/AboutUs';
+import Shop from './pages/Shop';
+import ProductDetail from './pages/ProductDetail';
+import Cart from './pages/Cart';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 
 function App() {
     const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
@@ -30,6 +35,10 @@ function App() {
                 <main>
                     <Routes>
                         <Route path="/" element={<Home />} />
+                        <Route path="/about" element={<AboutUs />} />
+                        <Route path="/shop" element={<Shop />} />
+                        <Route path="/product/:id" element={<ProductDetail />} />
+                        <Route path="/cart" element={<Cart />} />
                         <Route path="/login" element={<Login onLogin={handleLogin} />} />
                         <Route path="/register" element={<Register onLogin={handleLogin} />} />
                         <Route path="/dashboard" element={<Dashboard user={user} />} />
@@ -37,6 +46,7 @@ function App() {
                         <Route path="/order-success" element={<OrderSuccess />} />
                     </Routes>
                 </main>
+                <Footer />
             </div>
         </Router>
     );

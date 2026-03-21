@@ -70,8 +70,101 @@
         "Bags": "Balo túi xách"
     },
     "conditions": {
-        "NEW": "Mới",
+        "NEW": "Mới nguyên tag",
         "LIKE_NEW": "Như mới",
-        "USED": "Đã qua sử dụng"
+        "USED": "Đã sử dụng",
+        "GOOD": "Tốt / Đã dùng"
+    },
+    "navbar": {
+        "menu": "Thực Đơn",
+        "account": "Tài khoản",
+        "shop": "Cửa Hàng",
+        "about_us": "Về Chúng Tôi"
+    },
+    "home": {
+        "hero_title": "Hoài Cổ. Phong Cách.",
+        "hero_desc": "Thời trang vintage và đồ si tuyển chọn. Những món đồ Authentic cho phong cách sống hiện đại.",
+        "shop_collection": "Mua Sắm Ngay",
+        "new_arrivals": "Hàng Mới Về",
+        "new_arrivals_desc": "Những món đồ mới nhất vừa được thêm vào",
+        "view_all": "Xem Tất Cả",
+        "view_all_drop": "Xem Toàn Bộ",
+        "vintage": "Vintage",
+        "shop_now": "Mua Ngay",
+        "streetwear": "Streetwear",
+        "explore": "Khám Phá",
+        "the_archive": "Kho Lưu Trữ",
+        "archive_desc": "Khám phá cách chúng tôi tìm kiếm và tuyển chọn những bộ sưu tập độc đáo này.",
+        "our_story": "Câu chuyện của chúng tôi"
+    },
+    "shop": {
+        "title": "Cửa Hàng",
+        "pieces_available": "Đang có sẵn {{count}} món đồ tuyển chọn",
+        "sort_by": "Sắp xếp theo",
+        "sort_options": "Tuỳ chọn sắp xếp",
+        "sort_newest": "Hàng mới nhất",
+        "sort_price_asc": "Giá: Thấp đến Cao",
+        "sort_price_desc": "Giá: Cao đến Thấp",
+        "condition_rating": "Tình trạng",
+        "any_condition": "Tất cả tình trạng",
+        "filters_and_sort": "Lọc & Sắp xếp",
+        "show_items": "Xem {{count}} sản phẩm",
+        "no_items_title": "Không Tồn Tại Lựa Chọn Phù Hợp",
+        "no_items_desc": "Chúng tôi không tìm thấy món hàng nào phù hợp với bộ lọc. Hãy thử đặt lại bộ lọc để xem các mặt hàng khác.",
+        "reset_filters": "Xoá Tất Cả Bộ Lọc"
+    },
+    "product_detail": {
+        "back": "Trở lại",
+        "fast_delivery": "Giao Hàng Siêu Tốc",
+        "authentic": "Hàng Chính Hãng",
+        "add_to_archive": "Thêm Vào Giỏ",
+        "add_price": "Thêm - {{price}}",
+        "product_not_found": "Không tìm thấy sản phẩm."
+    },
+    "cart": {
+        "title": "Kho Lưu Trữ",
+        "empty": "Chưa có gì trong giỏ",
+        "continue_shopping": "Tiếp Tục Mua Sắm",
+        "order_summary": "Tóm Tắt Đơn Hàng",
+        "subtotal": "Tạm tính ({{count}} sản phẩm)",
+        "estimated_shipping": "Phí Vận Chuyển",
+        "free": "Miễn Phí",
+        "taxes": "Thuế",
+        "total": "Tổng Cộng",
+        "secure_checkout": "Thanh Toán An Toàn",
+        "estimated_total": "Tổng Cộng (Tạm Tính)",
+        "checkout_now": "Thanh Toán Ngay"
+    },
+    "footer": {
+        "desc": "Tuyển chọn đồ si và vintage chất lượng hướng tới thời trang bền vững.",
+        "navigation": "Điều Hướng",
+        "legal": "Chính Sách",
+        "terms": "Điều khoản dịch vụ",
+        "privacy": "Chính sách bảo mật",
+        "returns": "Đổi trả & Hoàn tiền",
+        "social": "Mạng Xã Hội",
+        "rights": "© 2026 Shop2Hand. Tất cả quyền được bảo lưu."
+    },
+    "about_us": {
+        "hero_title": "Kho Lưu Trữ",
+        "hero_desc": "Tuyển chọn cho phong cách hiện đại. Khám phá những món đồ vintage chính hãng đi cùng năm tháng.",
+        "explore_story": "Khám Phá Câu Chuyện",
+        "story_title": "Hành Trình Của Chúng Tôi",
+        "story_desc1": "Chúng tôi bắt đầu với một niềm tin đơn giản: Những bộ quần áo mang dấu ấn thời gian luôn có giá trị bền vững nhất. Hành trình bắt đầu từ những cửa hàng đồ cũ địa phương, tìm kiếm những món đồ đi cùng năm tháng.",
+        "story_desc2": "Giờ đây, chúng tôi tự tay tuyển lựa đồ si, second-hand và streetwear vintage để đảm bảo mọi món đồ khi lên kệ đều đáp ứng tiêu chuẩn tốt nhất.",
+        "values_title": "Giá Trị Cốt Lõi",
+        "sustainability": "Bền Vững",
+        "sustainability_desc": "Đề cao sự tuần hoàn, kéo dài vòng đời sản phẩm may mặc.",
+        "authenticity": "Chuẩn Xịn",
+        "authenticity_desc": "Mọi mặt hàng đều được kiểm định kỹ lưỡng trước khi bán ra.",
+        "curation": "Tuyển Lựa",
+        "curation_desc": "Cam kết mang đến những item mang đậm tính thời trang lưu trữ.",
+        "lookbook_title": "Lookbook",
+        "lookbook_desc": "Khám phá cách chúng tôi phối những item vintage tâm đắc nhất.",
+        "behind_scenes": "Hậu Trường",
+        "behind_desc": "Cái nhìn cận cảnh về hành trình săn lùng đồ si cực độc lạ.",
+        "cta_title": "Sẵn Sàng Định Hình Phong Cách?",
+        "cta_desc": "Gia nhập thế giới thời trang vintage cùng hàng ngàn bạn trẻ dẫn đầu xu hướng lưu trữ.",
+        "shop_now_btn": "Khám Phá Cửa Hàng"
     }
 }
