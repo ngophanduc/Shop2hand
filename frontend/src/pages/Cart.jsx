@@ -2,15 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Trash2, ShoppingBag, ArrowRight, ShieldCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { formatPrice } from '../utils/currency';
 
 const Cart = () => {
     const [cart, setCart] = useState([]);
     const navigate = useNavigate();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
-    useEffect(() => {
+    const loadCart = () => {
         const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
         setCart(storedCart);
+    };
+
+    useEffect(() => {
+        loadCart();
+        window.addEventListener('storage', loadCart);
+        return () => window.removeEventListener('storage', loadCart);
     }, []);
 
     const updateQuantity = (id, newQuantity) => {
@@ -30,12 +37,10 @@ const Cart = () => {
         window.dispatchEvent(new Event('storage'));
     };
 
-    const formatPrice = (price) => {
-        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
-    };
-
     const totalAmount = cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
     const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+
+    const formatPriceDisplay = (price) => formatPrice(price, i18n.language);
 
     if (cart.length === 0) {
         return (
@@ -121,7 +126,7 @@ const Cart = () => {
                                                 </button>
                                             </div>
                                         </div>
-                                        <span className="text-xl font-bold text-black tracking-tight">{formatPrice(item.price)}</span>
+                                        <span className="text-xl font-bold text-black tracking-tight">{formatPriceDisplay(item.price)}</span>
                                     </div>
                                 </div>
                             </div>
@@ -135,7 +140,7 @@ const Cart = () => {
                             <div className="space-y-4 mb-8 text-sm font-medium">
                                 <div className="flex justify-between text-gray-500">
                                     <span>{t('cart.subtotal', { count: totalItems })}</span>
-                                    <span className="text-black font-bold">{formatPrice(totalAmount)}</span>
+                                    <span className="text-black font-bold">{formatPriceDisplay(totalAmount)}</span>
                                 </div>
                                 <div className="flex justify-between text-gray-500">
                                     <span>{t('cart.estimated_shipping')}</span>
@@ -143,14 +148,14 @@ const Cart = () => {
                                 </div>
                                 <div className="flex justify-between text-gray-500">
                                     <span>{t('cart.taxes')}</span>
-                                    <span className="text-black font-bold">{formatPrice(0)}</span>
+                                    <span className="text-black font-bold">{formatPriceDisplay(0)}</span>
                                 </div>
                             </div>
 
                             <div className="border-t border-gray-200 pt-6 mb-8">
                                 <div className="flex justify-between items-end">
                                     <span className="text-xs font-bold uppercase tracking-widest text-gray-400">{t('cart.total')}</span>
-                                    <span className="text-3xl font-black tracking-tighter text-black">{formatPrice(totalAmount)}</span>
+                                    <span className="text-3xl font-black tracking-tighter text-black">{formatPriceDisplay(totalAmount)}</span>
                                 </div>
                             </div>
 
@@ -173,7 +178,7 @@ const Cart = () => {
             <div className="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-gray-100 p-4 z-40 md:hidden flex items-center justify-between shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
                 <div className="flex flex-col">
                     <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-0.5">{t('cart.estimated_total')}</span>
-                    <span className="text-xl font-black text-black tracking-tight">{formatPrice(totalAmount)}</span>
+                    <span className="text-xl font-black text-black tracking-tight">{formatPriceDisplay(totalAmount)}</span>
                 </div>
                 <button
                     onClick={() => navigate('/checkout')}

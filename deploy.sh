@@ -17,6 +17,7 @@ rsync -avz --exclude 'node_modules' --exclude 'target' --exclude '.git' --exclud
 # SSH and run docker-compose
 ssh $VPS_USER@$VPS_IP "cd $PROJECT_DIR && \
     mkdir -p /var/www/certbot && \
-    docker-compose up --build -d"
+    docker-compose down && \
+    docker-compose up --build --force-recreate --remove-orphans -d"
 
 echo "Deployment finished! Visit https://passgiay.shop to check."

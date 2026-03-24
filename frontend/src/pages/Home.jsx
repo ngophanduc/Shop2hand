@@ -18,8 +18,8 @@ const Home = () => {
     useEffect(() => {
         const fetchFeatured = async () => {
             try {
-                const { data } = await productService.getAll(null, '');
-                setFeatured(Array.isArray(data) ? data.slice(0, 4) : []);
+                const { data } = await productService.getFeatured();
+                setFeatured(Array.isArray(data) ? data : []);
             } catch (error) {
                 console.error(error);
             }

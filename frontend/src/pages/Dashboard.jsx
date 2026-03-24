@@ -25,6 +25,39 @@ const Dashboard = ({ user }) => {
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [previews, setPreviews] = useState([]);
     const [submitting, setSubmitting] = useState(false);
+    const [compressing, setCompressing] = useState(false);
+
+    const MAX_IMAGES = 5;
+    const MAX_WIDTH = 1280;
+    const JPEG_QUALITY = 0.82;
+
+    // Nén ảnh phía client bằng Canvas API trước khi upload
+    const compressImage = (file) => {
+        return new Promise((resolve) => {
+            const img = new Image();
+            const objectUrl = URL.createObjectURL(file);
+            img.onload = () => {
+                URL.revokeObjectURL(objectUrl);
+                let { width, height } = img;
+                // Chỉ resize nếu ảnh lớn hơn MAX_WIDTH
+                if (width > MAX_WIDTH) {
+                    height = Math.round((height * MAX_WIDTH) / width);
+                    width = MAX_WIDTH;
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                canvas.toBlob(
+                    (blob) => resolve(new File([blob], file.name, { type: 'image/jpeg' })),
+                    'image/jpeg',
+                    JPEG_QUALITY
+                );
+            };
+            img.src = objectUrl;
+        });
+    };
 
     const navigate = useNavigate();
 
@@ -70,12 +103,23 @@ const Dashboard = ({ user }) => {
         }
     };
 
-    const handleFileChange = (e) => {
-        const files = Array.from(e.target.files);
-        setSelectedFiles(prev => [...prev, ...files]);
-
-        const newPreviews = files.map(file => URL.createObjectURL(file));
-        setPreviews(prev => [...prev, ...newPreviews]);
+    const handleFileChange = async (e) => {
+        const newFiles = Array.from(e.target.files);
+        const remaining = MAX_IMAGES - selectedFiles.length;
+        if (remaining <= 0) {
+            alert(`Tối đa ${MAX_IMAGES} ảnh mỗi sản phẩm.`);
+            return;
+        }
+        const filesToProcess = newFiles.slice(0, remaining);
+        setCompressing(true);
+        try {
+            const compressed = await Promise.all(filesToProcess.map(compressImage));
+            setSelectedFiles(prev => [...prev, ...compressed]);
+            const newPreviews = compressed.map(file => URL.createObjectURL(file));
+            setPreviews(prev => [...prev, ...newPreviews]);
+        } finally {
+            setCompressing(false);
+        }
     };
 
     const removeFile = (index) => {
@@ -377,25 +421,32 @@ const Dashboard = ({ user }) => {
                                             </button>
                                         </div>
                                     ))}
-                                    <label className="aspect-square rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center cursor-pointer hover:border-black transition-colors group">
-                                        <ImageIcon className="text-gray-300 group-hover:text-black transition-colors" size={24} />
-                                        <span className="text-[10px] font-bold text-gray-400 group-hover:text-black mt-2">{t('dashboard.upload')}</span>
-                                        <input
-                                            type="file"
-                                            multiple
-                                            accept="image/*"
-                                            className="hidden"
-                                            onChange={handleFileChange}
-                                        />
-                                    </label>
+                                    {compressing ? (
+                                        <label className="aspect-square rounded-2xl border-2 border-dashed border-yellow-300 bg-yellow-50 flex flex-col items-center justify-center">
+                                            <div className="w-5 h-5 border-2 border-yellow-400/40 border-t-yellow-500 rounded-full animate-spin mb-1" />
+                                            <span className="text-[10px] font-bold text-yellow-500">Đang nén...</span>
+                                        </label>
+                                    ) : selectedFiles.length < MAX_IMAGES ? (
+                                        <label className="aspect-square rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center cursor-pointer hover:border-black transition-colors group">
+                                            <ImageIcon className="text-gray-300 group-hover:text-black transition-colors" size={24} />
+                                            <span className="text-[10px] font-bold text-gray-400 group-hover:text-black mt-2">{t('dashboard.upload')}</span>
+                                            <input
+                                                type="file"
+                                                multiple
+                                                accept="image/*"
+                                                className="hidden"
+                                                onChange={handleFileChange}
+                                            />
+                                        </label>
+                                    ) : null}
                                 </div>
-                                <p className="text-[10px] text-gray-400 italic">{t('dashboard.cloudinary_note')}</p>
+                                <p className="text-[10px] text-gray-400 italic">Tối đa {MAX_IMAGES} ảnh • ảnh được nén tự động trước khi upload</p>
                             </div>
 
                             <button
                                 type="submit"
-                                disabled={submitting}
-                                className={`w-full bg-black text-white py-5 rounded-3xl font-bold text-lg transition-all shadow-xl shadow-black/10 mt-4 flex items-center justify-center gap-2 ${submitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-gray-800'
+                                disabled={submitting || compressing}
+                                className={`w-full bg-black text-white py-5 rounded-3xl font-bold text-lg transition-all shadow-xl shadow-black/10 mt-4 flex items-center justify-center gap-2 ${submitting || compressing ? 'opacity-70 cursor-not-allowed' : 'hover:bg-gray-800'
                                     }`}
                             >
                                 {submitting ? (

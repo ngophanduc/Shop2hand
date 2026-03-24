@@ -35,6 +35,7 @@ public class OrderService {
         Order order = Order.builder()
                 .buyer(buyer)
                 .product(product)
+                .priceAtPurchase(product.getPrice())
                 .fullName(request.getFullName())
                 .address(request.getAddress())
                 .phone(request.getPhone())

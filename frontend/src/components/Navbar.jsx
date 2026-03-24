@@ -49,7 +49,7 @@ const Navbar = ({ user, onLogout }) => {
 
     return (
         <nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white/95 backdrop-blur-md shadow-sm py-3' : 'bg-transparent py-5'}`}>
-            <div className="max-max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between">
+            <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => setIsMobileMenuOpen(true)}
@@ -158,7 +158,7 @@ const Navbar = ({ user, onLogout }) => {
                 onClick={() => setIsMobileMenuOpen(false)}
             />
 
-            <div className={`fixed top-0 left-0 h-full w-[85vw] max-w-[350px] bg-white z-50 transform transition-transform duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] md:hidden flex flex-col shadow-2xl ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <div className={`fixed inset-y-0 left-0 h-screen w-[85vw] max-w-[300px] bg-white z-[60] transform transition-transform duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] md:hidden flex flex-col shadow-2xl ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="flex items-center justify-between p-6 border-b border-gray-100">
                     <div className="flex items-center gap-3">
                         <img src={logo} alt="Logo" className="w-10 h-10 rounded-xl object-cover" />
@@ -167,19 +167,19 @@ const Navbar = ({ user, onLogout }) => {
                     <button
                         onClick={() => setIsMobileMenuOpen(false)}
                         className="p-2 -mr-2 text-gray-400 hover:text-black transition-colors rounded-full hover:bg-gray-50 bg-gray-50/50"
-                    >Passgiay
+                    >
                         <X size={24} />
                     </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto py-8 px-6 flex flex-col gap-8">
+                <div className="flex-1 overflow-y-auto pt-6 pb-12 px-6 flex flex-col gap-8">
                     <div className="flex flex-col gap-6">
                         <span className="text-xs font-bold text-gray-400 uppercase tracking-widest px-2">{t('navbar.menu')}</span>
                         {navLinks.map((link) => (
                             <Link
                                 key={link.name}
                                 to={link.path}
-                                className={`text-4xl font-bold tracking-tight transition-colors px-2 py-1 ${location.pathname === link.path ? 'text-black' : 'text-gray-300 hover:text-gray-800'}`}
+                                className={`text-3xl font-black tracking-tight transition-colors px-2 py-1 ${location.pathname === link.path ? 'text-black' : 'text-gray-300 hover:text-gray-800'}`}
                             >
                                 {link.name}
                             </Link>

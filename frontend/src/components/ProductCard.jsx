@@ -1,8 +1,9 @@
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatPrice } from '../utils/currency';
 import { Link } from 'react-router-dom';
 
-const ProductCard = ({ product }) => {
+const ProductCard = memo(({ product }) => {
     const { t, i18n } = useTranslation();
 
     return (
@@ -14,6 +15,8 @@ const ProductCard = ({ product }) => {
                 <img
                     src={product.imageUrls?.[0] || 'https://images.unsplash.com/photo-1594411133999-119c631405fc?w=500&q=80'}
                     alt={product.title}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
@@ -49,6 +52,9 @@ const ProductCard = ({ product }) => {
             </div>
         </Link>
     );
-};
+});
+
+ProductCard.displayName = 'ProductCard';
 
 export default ProductCard;
+

@@ -37,6 +37,9 @@ public class Order {
 
     private String note;
 
+    @Column(name = "price_at_purchase", nullable = false)
+    private java.math.BigDecimal priceAtPurchase;
+
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 

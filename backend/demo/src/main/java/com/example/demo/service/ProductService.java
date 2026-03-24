@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,6 +53,12 @@ public class ProductService {
         return products.stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
+    public List<ProductResponse> getFeaturedProducts() {
+        return productRepository
+                .findTop4ByOrderByIdDesc()
+                .stream().map(this::mapToResponse).collect(Collectors.toList());
+    }
+
     public ProductResponse getProductById(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
@@ -83,16 +92,26 @@ public class ProductService {
 
         if (imageFiles != null && !imageFiles.isEmpty()) {
             Product finalProduct = product;
-            List<ProductImage> images = imageFiles.stream().map(file -> {
-                try {
-                    String url = cloudinaryService.uploadImage(file);
-                    return ProductImage.builder().product(finalProduct).imageUrl(url).build();
-                } catch (java.io.IOException e) {
-                    throw new RuntimeException("Image upload failed", e);
-                }
-            }).collect(Collectors.toList());
-            productImageRepository.saveAll(images);
-            product.setImages(images);
+            ExecutorService executor = Executors.newFixedThreadPool(Math.min(imageFiles.size(), 4));
+            try {
+                List<CompletableFuture<ProductImage>> futures = imageFiles.stream().map(file ->
+                        CompletableFuture.supplyAsync(() -> {
+                            try {
+                                String url = cloudinaryService.uploadImage(file);
+                                return ProductImage.builder().product(finalProduct).imageUrl(url).build();
+                            } catch (java.io.IOException e) {
+                                throw new RuntimeException("Image upload failed", e);
+                            }
+                        }, executor)
+                ).collect(Collectors.toList());
+                List<ProductImage> images = futures.stream()
+                        .map(CompletableFuture::join)
+                        .collect(Collectors.toList());
+                productImageRepository.saveAll(images);
+                product.setImages(images);
+            } finally {
+                executor.shutdown();
+            }
         }
 
         return mapToResponse(product);
@@ -130,15 +149,25 @@ public class ProductService {
                 product.getImages().clear();
                 productImageRepository.deleteByProductId(id);
                 Product finalProduct = product;
-                List<ProductImage> images = validFiles.stream().map(file -> {
-                    try {
-                        String url = cloudinaryService.uploadImage(file);
-                        return ProductImage.builder().product(finalProduct).imageUrl(url).build();
-                    } catch (java.io.IOException e) {
-                        throw new RuntimeException("Image upload failed", e);
-                    }
-                }).collect(Collectors.toList());
-                product.getImages().addAll(images);
+                ExecutorService executor = Executors.newFixedThreadPool(Math.min(validFiles.size(), 4));
+                try {
+                    List<CompletableFuture<ProductImage>> futures = validFiles.stream().map(file ->
+                            CompletableFuture.supplyAsync(() -> {
+                                try {
+                                    String url = cloudinaryService.uploadImage(file);
+                                    return ProductImage.builder().product(finalProduct).imageUrl(url).build();
+                                } catch (java.io.IOException e) {
+                                    throw new RuntimeException("Image upload failed", e);
+                                }
+                            }, executor)
+                    ).collect(Collectors.toList());
+                    List<ProductImage> images = futures.stream()
+                            .map(CompletableFuture::join)
+                            .collect(Collectors.toList());
+                    product.getImages().addAll(images);
+                } finally {
+                    executor.shutdown();
+                }
             }
         }
 

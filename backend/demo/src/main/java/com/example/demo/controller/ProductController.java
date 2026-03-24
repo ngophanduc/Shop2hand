@@ -3,9 +3,13 @@ package com.example.demo.controller;
 import com.example.demo.dto.ProductRequest;
 import com.example.demo.dto.ProductResponse;
 import com.example.demo.service.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -23,24 +27,29 @@ public class ProductController {
         return ResponseEntity.ok(productService.getAllProducts(categoryId, search));
     }
 
+    @GetMapping("/featured")
+    public ResponseEntity<List<ProductResponse>> getFeaturedProducts() {
+        return ResponseEntity.ok(productService.getFeaturedProducts());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(productService.getProductById(id));
     }
 
-    @PostMapping(consumes = { "multipart/form-data" })
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductResponse> createProduct(
-            @RequestPart("product") ProductRequest request,
-            @RequestPart(value = "files", required = false) List<org.springframework.web.multipart.MultipartFile> files) {
-        return ResponseEntity.ok(productService.createProduct(request, files));
+            @Valid @RequestPart("product") ProductRequest request,
+            @RequestPart("images") List<MultipartFile> images) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(productService.createProduct(request, images));
     }
 
-    @PutMapping(value = "/{id}", consumes = { "multipart/form-data" })
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductResponse> updateProduct(
             @PathVariable("id") Long id,
-            @RequestPart("product") ProductRequest request,
-            @RequestPart(value = "files", required = false) List<org.springframework.web.multipart.MultipartFile> files) {
-        return ResponseEntity.ok(productService.updateProduct(id, request, files));
+            @Valid @RequestPart("product") ProductRequest request,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images) {
+        return ResponseEntity.ok(productService.updateProduct(id, request, images));
     }
 
     @DeleteMapping("/{id}")

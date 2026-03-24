@@ -25,7 +25,13 @@ public class CloudinaryService {
     }
 
     public String uploadImage(MultipartFile file) throws IOException {
-        Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
-        return uploadResult.get("url").toString();
+        Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
+                "quality", "auto:good",
+                "fetch_format", "auto",
+                "width", 1200,
+                "crop", "limit"
+        ));
+        // Trả về URL https thay vì http
+        return uploadResult.get("secure_url").toString();
     }
 }
