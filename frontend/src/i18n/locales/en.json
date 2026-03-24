@@ -35,7 +35,10 @@
         "already_have_account": "Already have an account?",
         "dont_have_account": "Don't have an account?",
         "authenticating": "Authenticating...",
-        "creating_account": "Creating account..."
+        "creating_account": "Creating account...",
+        "email_taken": "Email is already taken",
+        "username_taken": "Username is already taken",
+        "registration_failed": "Registration failed. Please try again."
     },
     "dashboard": {
         "title": "Seller Dashboard",

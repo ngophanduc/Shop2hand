@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShoppingBag, User, LogOut, PlusCircle, Globe, Menu, X, ShoppingCart } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import logo from '../assets/logo/07654c94b33f3d61642e.jpg';
 
 const Navbar = ({ user, onLogout }) => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -58,10 +59,12 @@ const Navbar = ({ user, onLogout }) => {
                     </button>
 
                     <Link to="/" className="flex items-center gap-2 group z-10">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-md ${isDarkBackground ? 'bg-white text-black' : 'bg-black text-white'}`}>
-                            <ShoppingBag className="w-5 h-5" />
-                        </div>
-                        <span className={`font-bold text-xl tracking-tight hidden sm:block transition-colors ${isDarkBackground ? 'text-white' : 'text-black'}`}>Shop2Hand</span>
+                        <img 
+                            src={logo} 
+                            alt="Logo" 
+                            className="w-10 h-10 rounded-xl object-cover group-hover:scale-110 transition-transform duration-300 shadow-md"
+                        />
+                        <span className={`font-bold text-xl tracking-tight hidden sm:block transition-colors ${isDarkBackground ? 'text-white' : 'text-black'}`}>passgiay</span>
                     </Link>
                 </div>
 
@@ -158,15 +161,13 @@ const Navbar = ({ user, onLogout }) => {
             <div className={`fixed top-0 left-0 h-full w-[85vw] max-w-[350px] bg-white z-50 transform transition-transform duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] md:hidden flex flex-col shadow-2xl ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="flex items-center justify-between p-6 border-b border-gray-100">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center">
-                            <ShoppingBag className="text-white w-5 h-5" />
-                        </div>
-                        <span className="font-bold text-xl tracking-tight text-black">Shop2Hand</span>
+                        <img src={logo} alt="Logo" className="w-10 h-10 rounded-xl object-cover" />
+                        <span className="font-bold text-xl tracking-tight text-black">Passgiay</span>
                     </div>
                     <button
                         onClick={() => setIsMobileMenuOpen(false)}
                         className="p-2 -mr-2 text-gray-400 hover:text-black transition-colors rounded-full hover:bg-gray-50 bg-gray-50/50"
-                    >
+                    >Passgiay
                         <X size={24} />
                     </button>
                 </div>

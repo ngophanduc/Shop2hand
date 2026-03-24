@@ -42,6 +42,7 @@ function App() {
                         <Route path="/login" element={<Login onLogin={handleLogin} />} />
                         <Route path="/register" element={<Register onLogin={handleLogin} />} />
                         <Route path="/dashboard" element={<Dashboard user={user} />} />
+                        <Route path="/checkout" element={<Checkout />} />
                         <Route path="/checkout/:id" element={<Checkout />} />
                         <Route path="/order-success" element={<OrderSuccess />} />
                     </Routes>

@@ -29,10 +29,10 @@ public class AuthService {
 
     public AuthResponse register(AuthRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Username is already taken");
+            throw new RuntimeException("Username is already taken / Tên đăng nhập đã tồn tại");
         }
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email is already taken");
+            throw new RuntimeException("Email is already taken / Email đã được sử dụng");
         }
 
         User user = User.builder()
@@ -52,8 +52,7 @@ public class AuthService {
 
     public AuthResponse login(AuthRequest request) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-        );
+                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
         String token = tokenProvider.generateToken(authentication);
         User user = userRepository.findByUsername(request.getUsername()).orElseThrow();

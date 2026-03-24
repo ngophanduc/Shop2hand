@@ -35,7 +35,10 @@
         "already_have_account": "Đã có tài khoản?",
         "dont_have_account": "Chưa có tài khoản?",
         "authenticating": "Đang xác thực...",
-        "creating_account": "Đang tạo tài khoản..."
+        "creating_account": "Đang tạo tài khoản...",
+        "email_taken": "Email này đã được sử dụng",
+        "username_taken": "Tên đăng nhập đã tồn tại",
+        "registration_failed": "Đăng ký không thành công. Hãy thử lại."
     },
     "dashboard": {
         "title": "Bảng quản lý",

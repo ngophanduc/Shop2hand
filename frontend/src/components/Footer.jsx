@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Instagram, Facebook, Twitter } from 'lucide-react';
+import { Instagram, Facebook, Phone } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+
 
 const Footer = () => {
     const { t } = useTranslation();
@@ -11,11 +12,17 @@ const Footer = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
                     <div className="col-span-1 md:col-span-2">
                         <Link to="/" className="inline-block font-black text-3xl tracking-tighter mb-6 text-white hover:text-gray-300 transition-colors">
-                            Shop2Hand
+                            passgiay
                         </Link>
                         <p className="text-gray-400 font-light max-w-sm leading-relaxed">
                             {t('footer.desc')}
                         </p>
+                        <div className="mt-6 flex items-center text-gray-400 bg-gray-900/50 p-3 rounded-lg border border-gray-800 w-fit hover:border-gray-600 transition-colors">
+                            <Phone className="w-5 h-5 mr-3 text-white" />
+                            <a href="tel:0901964692" className="hover:text-white transition-colors text-lg tracking-wider font-medium font-mono">
+                                0901964692
+                            </a>
+                        </div>
                     </div>
 
                     <div>
@@ -42,14 +49,11 @@ const Footer = () => {
                         {t('footer.rights')}
                     </p>
                     <div className="flex gap-4">
-                        <a href="#" className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-gray-400 hover:bg-white hover:text-black transition-all">
+                        <a href="https://www.instagram.com/pass.giay/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-gray-400 hover:bg-white hover:text-black transition-all">
                             <Instagram size={18} />
                         </a>
-                        <a href="#" className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-gray-400 hover:bg-white hover:text-black transition-all">
+                        <a href="https://www.facebook.com/hahahihi2222" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-gray-400 hover:bg-white hover:text-black transition-all">
                             <Facebook size={18} />
-                        </a>
-                        <a href="#" className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-gray-400 hover:bg-white hover:text-black transition-all">
-                            <Twitter size={18} />
                         </a>
                     </div>
                 </div>

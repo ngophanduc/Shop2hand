@@ -14,6 +14,10 @@ i18n
             vi: { translation: vi }
         },
         fallbackLng: 'vi',
+        detection: {
+            order: ['localStorage', 'htmlTag', 'path', 'subdomain'],
+            caches: ['localStorage']
+        },
         interpolation: {
             escapeValue: false
         }

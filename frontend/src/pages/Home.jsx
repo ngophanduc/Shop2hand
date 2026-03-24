@@ -4,7 +4,9 @@ import { productService } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-
+import vintageImg from '../assets/AboutUs/LookbookGallery/3293ec6085cd0b9352dc.jpg';
+import streetwearImg from '../assets/AboutUs/LookbookGallery/d21f43ec3941b71fee50.jpg';
+import storyImg from '../assets/AboutUs/HeroSection/9902a5df1e73902dc962.jpg';
 const images = import.meta.glob('../assets/AboutUs/CTASection/*.{png,jpg,jpeg,svg,webp,PNG,JPG,JPEG,SVG,WEBP}', { eager: true });
 const imageUrls = Object.values(images).map((module) => module.default);
 const heroBgImage = imageUrls.length > 0 ? imageUrls[0] : 'https://images.unsplash.com/photo-1528650017409-90696eb64fcd?w=1600&q=80';
@@ -36,7 +38,7 @@ const Home = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
                 <div className="relative z-10 text-center px-4 max-w-4xl mx-auto mt-20 animate-[fadeIn_1s_ease-out_forwards]">
-                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white uppercase tracking-tighter mb-6 leading-[1.1]">
+                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white uppercase tracking-tighter mb-6 leading-[1.1] whitespace-nowrap">
                         {t('home.hero_title')}
                     </h1>
                     <p className="text-gray-300 text-lg md:text-xl font-light mb-10 max-w-lg mx-auto tracking-wide">
@@ -87,7 +89,7 @@ const Home = () => {
                 <div className="max-w-7xl mx-auto px-4 md:px-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-[600px]">
                         <Link to="/shop?category=vintage" className="relative rounded-3xl overflow-hidden group">
-                            <img src="https://images.unsplash.com/photo-1542272201-b1ca555f8505?w=800&q=80" alt="Vintage" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                            <img src={vintageImg} alt="Vintage" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                             <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors" />
                             <div className="absolute bottom-10 left-10">
                                 <h3 className="text-4xl font-black uppercase tracking-tighter text-white mb-2">{t('home.vintage')}</h3>
@@ -96,7 +98,7 @@ const Home = () => {
                         </Link>
                         <div className="grid grid-rows-2 gap-4">
                             <Link to="/shop?category=streetwear" className="relative rounded-3xl overflow-hidden group">
-                                <img src="https://images.unsplash.com/photo-1523398002811-999aa8d9512e?w=800&q=80" alt="Streetwear" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                                <img src={streetwearImg} alt="Streetwear" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
                                 <div className="absolute bottom-8 left-8">
                                     <h3 className="text-3xl font-black uppercase tracking-tighter text-white mb-2">{t('home.streetwear')}</h3>
@@ -104,7 +106,7 @@ const Home = () => {
                                 </div>
                             </Link>
                             <Link to="/about" className="relative rounded-3xl overflow-hidden group bg-black">
-                                <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&q=80" alt="Our Story" className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-700 grayscale" />
+                                <img src={storyImg} alt="Our Story" className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-700 grayscale" />
                                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6">
                                     <h3 className="text-3xl font-black uppercase tracking-tighter text-white mb-4">{t('home.the_archive')}</h3>
                                     <p className="text-gray-300 font-light text-sm max-w-xs mb-6">{t('home.archive_desc')}</p>

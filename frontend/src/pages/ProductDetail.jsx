@@ -174,8 +174,8 @@ const ProductDetail = () => {
                         onClick={addToCart}
                         disabled={product.status === 'SOLD'}
                         className={`hidden md:flex w-full h-14 rounded-2xl font-bold uppercase tracking-widest text-sm items-center justify-center gap-2 transition-all shadow-lg ${product.status === 'SOLD'
-                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none border border-gray-200'
-                                : 'bg-black text-white hover:scale-[1.02] hover:shadow-black/20'
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none border border-gray-200'
+                            : 'bg-black text-white hover:scale-[1.02] hover:shadow-black/20'
                             }`}
                     >
                         <ShoppingBag size={18} />
@@ -189,8 +189,8 @@ const ProductDetail = () => {
                     onClick={addToCart}
                     disabled={product.status === 'SOLD'}
                     className={`flex-1 h-16 rounded-2xl font-bold uppercase tracking-widest text-sm flex items-center justify-center gap-2 shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-colors ${product.status === 'SOLD'
-                            ? 'bg-gray-200 text-gray-500 shadow-none'
-                            : 'bg-black/95 backdrop-blur-md text-white border border-white/10'
+                        ? 'bg-gray-200 text-gray-500 shadow-none'
+                        : 'bg-black/95 backdrop-blur-md text-white border border-white/10'
                         }`}
                 >
                     <ShoppingBag size={18} />

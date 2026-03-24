@@ -83,7 +83,7 @@ public class ProductService {
 
         if (imageFiles != null && !imageFiles.isEmpty()) {
             Product finalProduct = product;
-            List<ProductImage> images = imageFiles.parallelStream().map(file -> {
+            List<ProductImage> images = imageFiles.stream().map(file -> {
                 try {
                     String url = cloudinaryService.uploadImage(file);
                     return ProductImage.builder().product(finalProduct).imageUrl(url).build();
@@ -130,7 +130,7 @@ public class ProductService {
                 product.getImages().clear();
                 productImageRepository.deleteByProductId(id);
                 Product finalProduct = product;
-                List<ProductImage> images = validFiles.parallelStream().map(file -> {
+                List<ProductImage> images = validFiles.stream().map(file -> {
                     try {
                         String url = cloudinaryService.uploadImage(file);
                         return ProductImage.builder().product(finalProduct).imageUrl(url).build();

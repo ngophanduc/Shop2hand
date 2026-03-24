@@ -22,15 +22,38 @@ const LookbookGallery = () => {
                 <p className="text-gray-500 font-light text-lg">{t('about_us.lookbook_desc')}</p>
             </div>
 
-            <div className="flex gap-4 md:gap-8 px-4 md:px-8 overflow-x-auto pb-8 snap-x custom-scrollbar">
-                {galleryImages.map((src, idx) => (
-                    <div key={idx} className="w-[80vw] md:w-[400px] shrink-0 aspect-[3/4] rounded-[2rem] overflow-hidden group snap-center relative">
-                        <img
-                            src={src}
-                            alt={`Lookbook ${idx + 1}`}
-                            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                        />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-500" />
+            <div className="relative overflow-hidden flex w-full group/marquee pb-8 gap-4 md:gap-8">
+                <style>{`
+                    @keyframes marquee {
+                        0% { transform: translateX(0%); }
+                        100% { transform: translateX(calc(-100% - 1rem)); }
+                    }
+                    @media (min-width: 768px) {
+                        @keyframes marquee {
+                            0% { transform: translateX(0%); }
+                            100% { transform: translateX(calc(-100% - 2rem)); }
+                        }
+                    }
+                    .animate-marquee {
+                        animation: marquee 60s linear infinite;
+                        width: max-content;
+                    }
+                    .group\\/marquee:hover .animate-marquee {
+                        animation-play-state: paused;
+                    }
+                `}</style>
+                {[0, 1].map((setIndex) => (
+                    <div key={setIndex} className="flex gap-4 md:gap-8 animate-marquee shrink-0">
+                        {[...galleryImages, ...galleryImages].map((src, idx) => (
+                            <div key={`${setIndex}-${idx}`} className="w-[70vw] md:w-[400px] shrink-0 aspect-[3/4] rounded-[2rem] overflow-hidden group/item relative cursor-pointer">
+                                <img
+                                    src={src}
+                                    alt={`Lookbook ${setIndex}-${idx + 1}`}
+                                    className="absolute inset-0 w-full h-full object-cover grayscale transition-all duration-700 group-hover/item:grayscale-0 group-hover/item:scale-110"
+                                />
+                                <div className="absolute inset-0 bg-black/0 group-hover/item:bg-black/10 transition-colors duration-500 pointer-events-none" />
+                            </div>
+                        ))}
                     </div>
                 ))}
             </div>

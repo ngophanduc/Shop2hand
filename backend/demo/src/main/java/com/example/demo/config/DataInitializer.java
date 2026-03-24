@@ -1,7 +1,6 @@
 package com.example.demo.config;
 
 import com.example.demo.entity.Category;
-import com.example.demo.entity.Product;
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.repository.ProductImageRepository;
 import com.example.demo.repository.ProductRepository;
@@ -27,13 +26,8 @@ public class DataInitializer {
             List<Category> allCategories = categoryRepository.findAll();
             for (Category cat : allCategories) {
                 if (!allowedCategories.contains(cat.getName())) {
-                    // Force set product category to null before deleting the category record
-                    productRepository.findAll().stream()
-                            .filter(p -> p.getCategory() != null && p.getCategory().getId().equals(cat.getId()))
-                            .forEach(p -> {
-                                p.setCategory(null);
-                                productRepository.save(p);
-                            });
+                    // Optimized: Use a single update query to set category to null
+                    productRepository.updateCategoryToNull(cat.getId());
                     categoryRepository.delete(cat);
                 }
             }
@@ -45,13 +39,8 @@ public class DataInitializer {
                 }
             }
 
-            // 3. Data Migration: Ensure all products have a status
-            productRepository.findAll().forEach(p -> {
-                if (p.getStatus() == null) {
-                    p.setStatus(Product.Status.AVAILABLE);
-                    productRepository.save(p);
-                }
-            });
+            // 3. Data Migration: Ensure all products have a status using a bulk update
+            productRepository.updateNullStatusToAvailable();
         };
     }
 }
