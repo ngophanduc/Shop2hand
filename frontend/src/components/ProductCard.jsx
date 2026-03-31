@@ -43,6 +43,7 @@ const ProductCard = memo(({ product }) => {
                 </div>
                 <p className="text-xs font-light text-gray-500 mb-2 truncate uppercase tracking-wider mt-1">
                     {t(`categories.${product.categoryName}`, { defaultValue: product.categoryName || 'General' })}
+                    {product.size && ` • Size ${product.size}`}
                 </p>
                 <div className="mt-auto pt-2 flex items-center justify-between">
                     <span className={`text-base font-bold tracking-tight ${product.status === 'SOLD' ? 'text-gray-400' : 'text-black'}`}>

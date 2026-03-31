@@ -22,6 +22,17 @@ const Shop = () => {
 
     useEffect(() => {
         fetchCategories();
+
+        // Listen for real-time updates via SSE
+        const eventSource = new EventSource('/api/sse/products');
+        eventSource.addEventListener('PRODUCT_UPDATE', () => {
+            console.log('Real-time update received (Shop)');
+            fetchProducts();
+        });
+
+        return () => {
+            eventSource.close();
+        };
     }, []);
 
     useEffect(() => {

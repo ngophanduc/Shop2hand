@@ -19,8 +19,8 @@
         "close": "Close",
         "add_to_cart": "Add to Cart",
         "buy_now": "Buy Now",
-        "sold": "SOLD",
-        "processing": "Processing..."
+        "processing": "Processing...",
+        "all_categories": "All Categories"
     },
     "auth": {
         "welcome_back": "Welcome Back",
@@ -60,8 +60,10 @@
         "start_selling_desc": "Start selling by adding your first secondhand item.",
         "create_first": "Create First Listing",
         "edit_product": "Edit Product",
-        "mark_sold": "Mark as Sold",
-        "mark_available": "Mark Available"
+        "mark_available": "Mark Available",
+        "all_status": "All Statuses",
+        "status_available": "Available",
+        "status_sold": "Sold"
     },
     "categories": {
         "Shirt": "Shirt",

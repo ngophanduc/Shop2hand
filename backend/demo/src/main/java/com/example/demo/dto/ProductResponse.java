@@ -22,5 +22,6 @@ public class ProductResponse {
     private Long categoryId;
     private String categoryName;
     private List<String> imageUrls;
+    private String size;
     private String createdAt;
 }

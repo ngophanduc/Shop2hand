@@ -48,6 +48,9 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @Column
+    private String size;
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("id ASC")
     private List<ProductImage> images;

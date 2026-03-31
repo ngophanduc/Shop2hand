@@ -20,7 +20,8 @@
         "add_to_cart": "Thêm vào giỏ",
         "buy_now": "Mua ngay",
         "sold": "Hết hàng",
-        "processing": "Đang xử lý..."
+        "processing": "Đang xử lý...",
+        "all_categories": "Tất cả danh mục"
     },
     "auth": {
         "welcome_back": "Chào mừng quay lại",
@@ -61,7 +62,10 @@
         "create_first": "Tạo tin đăng đầu tiên",
         "edit_product": "Sửa sản phẩm",
         "mark_sold": "Đánh dấu Đã bán",
-        "mark_available": "Đánh dấu Còn hàng"
+        "mark_available": "Hiện có sẵn",
+        "all_status": "Tất cả trạng thái",
+        "status_available": "Đang bán",
+        "status_sold": "Đã bán"
     },
     "categories": {
         "Shirt": "Áo",

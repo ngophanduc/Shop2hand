@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { productService } from '../services/api';
-import { ArrowLeft, ShoppingBag, Truck, ShieldCheck, ChevronRight, ChevronLeft } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, Truck, ShieldCheck, ChevronRight, ChevronLeft, Edit2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import ProductForm from '../components/ProductForm';
 
-const ProductDetail = () => {
+const SHOE_SIZES = ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45'];
+const CLOTHING_SIZES = ['XS', 'S', 'M', 'L', 'XL'];
+
+const ProductDetail = ({ user }) => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeImageIndex, setActiveImageIndex] = useState(0);
+    const [selectedSize, setSelectedSize] = useState(null);
+    const [showEditForm, setShowEditForm] = useState(false);
     const { t, i18n } = useTranslation();
 
     useEffect(() => {
@@ -25,7 +31,7 @@ const ProductDetail = () => {
         };
         fetchProduct();
         window.scrollTo(0, 0);
-    }, [id]);
+    }, [id, showEditForm]);
 
     const addToCart = () => {
         if (!product || product.status === 'SOLD') return;
@@ -136,13 +142,54 @@ const ProductDetail = () => {
                         </div>
                     </div>
 
-                    <h1 className="text-3xl md:text-5xl font-black text-black uppercase tracking-tighter mb-4 leading-tight">
-                        {product.title}
-                    </h1>
+                    <div className="flex items-center gap-4 mb-4">
+                        <h1 className="text-3xl md:text-5xl font-black text-black uppercase tracking-tighter leading-tight">
+                            {product.title}
+                        </h1>
+                        {user?.role === 'ADMIN' && (
+                            <button
+                                onClick={() => setShowEditForm(true)}
+                                className="p-3 bg-gray-50 border border-gray-100 rounded-2xl text-black hover:bg-black hover:text-white transition-all shadow-sm"
+                                title="Edit Product"
+                            >
+                                <Edit2 size={24} />
+                            </button>
+                        )}
+                    </div>
 
                     <p className="text-2xl font-medium text-gray-500 mb-8">
                         {formatPrice(product.price)}
                     </p>
+
+                    {product.size && (
+                        <div className="mb-10">
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">
+                                {t('common.select_size', { defaultValue: 'Select Size' })}
+                            </h3>
+                            <div className="flex flex-wrap gap-3">
+                                {(['Shoes', 'Shirt', 'Pants'].includes(product.categoryName) ? (product.categoryName === 'Shoes' ? SHOE_SIZES : CLOTHING_SIZES) : []).map(size => {
+                                    const isAvailable = product.size.split(',').includes(size);
+                                    const isSelected = selectedSize === size;
+                                    return (
+                                        <button
+                                            key={size}
+                                            type="button"
+                                            disabled={!isAvailable}
+                                            onClick={() => setSelectedSize(size)}
+                                            className={`w-14 h-14 rounded-2xl text-sm font-bold uppercase transition-all flex items-center justify-center border-2 ${isAvailable
+                                                ? (isSelected
+                                                    ? 'border-black bg-black text-white shadow-xl shadow-black/10 scale-105'
+                                                    : 'border-gray-200 bg-white text-black hover:border-black')
+                                                : 'border-gray-100 bg-gray-50 text-gray-400 cursor-not-allowed opacity-60'
+                                                }`}
+                                        >
+                                            {size}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
 
                     <div className="space-y-6 mb-12 border-y border-gray-100 py-8">
                         <div>
@@ -197,6 +244,16 @@ const ProductDetail = () => {
                     {product.status === 'SOLD' ? t('common.sold') : t('product_detail.add_price', { price: formatPrice(product.price) })}
                 </button>
             </div>
+
+            {showEditForm && (
+                <ProductForm 
+                    product={product} 
+                    onSuccess={() => {
+                        setShowEditForm(false);
+                    }}
+                    onCancel={() => setShowEditForm(false)}
+                />
+            )}
         </div>
     );
 };

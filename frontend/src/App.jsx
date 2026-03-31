@@ -37,7 +37,7 @@ function App() {
                         <Route path="/" element={<Home />} />
                         <Route path="/about" element={<AboutUs />} />
                         <Route path="/shop" element={<Shop />} />
-                        <Route path="/product/:id" element={<ProductDetail />} />
+                        <Route path="/product/:id" element={<ProductDetail user={user} />} />
                         <Route path="/cart" element={<Cart />} />
                         <Route path="/login" element={<Login onLogin={handleLogin} />} />
                         <Route path="/register" element={<Register onLogin={handleLogin} />} />

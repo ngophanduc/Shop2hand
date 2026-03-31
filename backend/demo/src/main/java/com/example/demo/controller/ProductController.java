@@ -11,6 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import java.util.List;
 
 @RestController
@@ -21,10 +25,19 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping
-    public ResponseEntity<List<ProductResponse>> getAllProducts(
+    public ResponseEntity<?> getAllProducts(
             @RequestParam(name = "categoryId", required = false) Long categoryId,
-            @RequestParam(name = "search", required = false) String search) {
-        return ResponseEntity.ok(productService.getAllProducts(categoryId, search));
+            @RequestParam(name = "search", required = false) String search,
+            @RequestParam(name = "status", required = false) String status,
+            @RequestParam(name = "page", required = false) Integer page,
+            @RequestParam(name = "size", required = false) Integer size) {
+        
+        if (page == null || size == null) {
+            return ResponseEntity.ok(productService.getAllProductsList(categoryId, search, status));
+        }
+        
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        return ResponseEntity.ok(productService.getAllProducts(categoryId, search, status, pageable));
     }
 
     @GetMapping("/featured")

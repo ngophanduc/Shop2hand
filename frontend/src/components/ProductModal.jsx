@@ -4,6 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { formatPrice } from '../utils/currency';
 
+const SHOE_SIZES = ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45'];
+const CLOTHING_SIZES = ['XS', 'S', 'M', 'L', 'XL'];
+
 const ProductModal = ({ product, onClose }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const { t, i18n } = useTranslation();
@@ -73,6 +76,16 @@ const ProductModal = ({ product, onClose }) => {
                             </span>
                             <h2 className="text-3xl font-bold text-primary mb-2 leading-tight">{product.title}</h2>
                             <p className="text-2xl font-black text-black">{formatPrice(product.price, i18n.language)}</p>
+                            {product.size && (
+                                <div className="mt-6">
+                                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">Sizes</h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {(['Shoes', 'Shirt', 'Pants'].includes(product.categoryName) ? (product.categoryName === 'Shoes' ? SHOE_SIZES : CLOTHING_SIZES) : []).map(size => {
+                                            const isAvailable = product.size.split(',').includes(size);
+                                        })}
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <div className="flex-1 overflow-y-auto mb-8 pr-2">

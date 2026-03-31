@@ -1,66 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { productService, categoryService } from '../services/api';
-import { Plus, Edit2, Trash2, Package, Image as ImageIcon, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, Package, Image as ImageIcon, X, ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { formatPrice } from '../utils/currency';
+import ProductForm from '../components/ProductForm';
 
 const Dashboard = ({ user }) => {
     const { t, i18n } = useTranslation();
-    const [products, setProducts] = useState([]);
-    const [categories, setCategories] = useState([]);
-    const [showForm, setShowForm] = useState(false);
-    const [editingProduct, setEditingProduct] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [formData, setFormData] = useState({
-        title: '',
-        description: '',
-        price: '',
-        conditionStatus: 'USED',
-        categoryId: '',
-        imageUrls: [''],
-        status: 'AVAILABLE'
-    });
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const pageSize = 10;
 
-    const [selectedFiles, setSelectedFiles] = useState([]);
-    const [previews, setPreviews] = useState([]);
-    const [submitting, setSubmitting] = useState(false);
-    const [compressing, setCompressing] = useState(false);
-
-    const MAX_IMAGES = 5;
-    const MAX_WIDTH = 1280;
-    const JPEG_QUALITY = 0.82;
-
-    // Nén ảnh phía client bằng Canvas API trước khi upload
-    const compressImage = (file) => {
-        return new Promise((resolve) => {
-            const img = new Image();
-            const objectUrl = URL.createObjectURL(file);
-            img.onload = () => {
-                URL.revokeObjectURL(objectUrl);
-                let { width, height } = img;
-                // Chỉ resize nếu ảnh lớn hơn MAX_WIDTH
-                if (width > MAX_WIDTH) {
-                    height = Math.round((height * MAX_WIDTH) / width);
-                    width = MAX_WIDTH;
-                }
-                const canvas = document.createElement('canvas');
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-                canvas.toBlob(
-                    (blob) => resolve(new File([blob], file.name, { type: 'image/jpeg' })),
-                    'image/jpeg',
-                    JPEG_QUALITY
-                );
-            };
-            img.src = objectUrl;
-        });
-    };
+    // Filter states
+    const [searchQuery, setSearchQuery] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
+    const [selectedCategoryId, setSelectedCategoryId] = useState('');
+    const [statusFilter, setStatusFilter] = useState('');
+    const [categories, setCategories] = useState([]);
 
     const navigate = useNavigate();
 
+
+    const [products, setProducts] = useState([]);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchQuery);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    useEffect(() => {
+        setCurrentPage(0);
+    }, [debouncedSearch, selectedCategoryId, statusFilter]);
 
     useEffect(() => {
         if (!user || user.role !== 'ADMIN') {
@@ -68,21 +42,39 @@ const Dashboard = ({ user }) => {
             return;
         }
         fetchAllData();
-    }, [user]);
+        
+        // Listen for real-time updates via SSE
+        const eventSource = new EventSource('/api/sse/products');
+        eventSource.addEventListener('PRODUCT_UPDATE', () => {
+            console.log('Real-time update received');
+            fetchAllData(true); // Silent update for SSE
+        });
 
-    const fetchAllData = async () => {
-        setLoading(true);
+        return () => {
+            eventSource.close();
+        };
+    }, [user, currentPage, debouncedSearch, selectedCategoryId, statusFilter]);
+
+    const fetchAllData = async (silent = false) => {
+        if (!silent) setLoading(true);
         await Promise.allSettled([
-            fetchProducts(),
+            fetchProducts(silent),
             fetchCategories()
         ]);
-        setLoading(false);
+        if (!silent) setLoading(false);
     };
 
-    const fetchProducts = async () => {
+    const fetchProducts = async (silent = false) => {
         try {
-            const res = await productService.getAll();
-            setProducts(res.data);
+            const res = await productService.getAll(
+                selectedCategoryId || null, 
+                debouncedSearch || null, 
+                statusFilter || null,
+                currentPage, 
+                pageSize
+            );
+            setProducts(res.data.content || []);
+            setTotalPages(res.data.totalPages || 0);
         } catch (error) {
             console.error('Error fetching products', error);
         }
@@ -99,86 +91,11 @@ const Dashboard = ({ user }) => {
             }
         } catch (error) {
             console.error('Error fetching categories', error);
-            alert('Failed to load categories. Please check if the backend is running and accessible.');
-        }
-    };
-
-    const handleFileChange = async (e) => {
-        const newFiles = Array.from(e.target.files);
-        const remaining = MAX_IMAGES - selectedFiles.length;
-        if (remaining <= 0) {
-            alert(`Tối đa ${MAX_IMAGES} ảnh mỗi sản phẩm.`);
-            return;
-        }
-        const filesToProcess = newFiles.slice(0, remaining);
-        setCompressing(true);
-        try {
-            const compressed = await Promise.all(filesToProcess.map(compressImage));
-            setSelectedFiles(prev => [...prev, ...compressed]);
-            const newPreviews = compressed.map(file => URL.createObjectURL(file));
-            setPreviews(prev => [...prev, ...newPreviews]);
-        } finally {
-            setCompressing(false);
-        }
-    };
-
-    const removeFile = (index) => {
-        setSelectedFiles(prev => prev.filter((_, i) => i !== index));
-        setPreviews(prev => {
-            URL.revokeObjectURL(prev[index]);
-            return prev.filter((_, i) => i !== index);
-        });
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setSubmitting(true);
-        try {
-            const formDataToSend = new FormData();
-
-            // Create product blob for @RequestPart("product")
-            const productBlob = new Blob([JSON.stringify({
-                title: formData.title,
-                description: formData.description,
-                price: formData.price,
-                conditionStatus: formData.conditionStatus,
-                categoryId: formData.categoryId,
-                status: formData.status
-            })], { type: 'application/json' });
-
-            formDataToSend.append('product', productBlob);
-
-            selectedFiles.forEach(file => {
-                formDataToSend.append('files', file);
-            });
-
-            if (editingProduct) {
-                await productService.update(editingProduct.id, formDataToSend);
-            } else {
-                await productService.create(formDataToSend);
-            }
-            setShowForm(false);
-            resetForm();
-            fetchAllData();
-        } catch (error) {
-            alert('Error saving product: ' + (error.response?.data?.error || error.message));
-        } finally {
-            setSubmitting(false);
         }
     };
 
     const handleEdit = (product) => {
         setEditingProduct(product);
-        setFormData({
-            title: product.title,
-            description: product.description,
-            price: product.price,
-            conditionStatus: product.conditionStatus,
-            categoryId: product.categoryId,
-            imageUrls: product.imageUrls,
-            status: product.status
-        });
-        setPreviews(product.imageUrls);
         setShowForm(true);
     };
 
@@ -197,11 +114,13 @@ const Dashboard = ({ user }) => {
             formDataToSend.append('product', productBlob);
 
             await productService.update(product.id, formDataToSend);
-            fetchAllData();
+            fetchAllData(true); // Silent update for manual toggle
         } catch (error) {
             console.error('Error toggling sold status:', error);
-            const errorMessage = error.response?.data?.message || error.response?.data?.error || error.message;
-            alert(`Failed to update status: ${errorMessage} (Status: ${error.response?.status})`);
+            if (error.response?.status !== 401 && error.response?.status !== 403) {
+                const errorMessage = error.response?.data?.message || error.response?.data?.error || error.message;
+                alert(`Failed to update status: ${errorMessage}`);
+            }
         }
     };
 
@@ -211,28 +130,23 @@ const Dashboard = ({ user }) => {
                 await productService.delete(id);
                 fetchAllData();
             } catch (error) {
-                alert('Error deleting product');
+                if (error.response?.status !== 401 && error.response?.status !== 403) {
+                    alert('Error deleting product');
+                }
             }
         }
     };
 
+    const [showForm, setShowForm] = useState(false);
+    const [editingProduct, setEditingProduct] = useState(null);
+
     const resetForm = () => {
         setEditingProduct(null);
-        setFormData({
-            title: '',
-            description: '',
-            price: '',
-            conditionStatus: 'USED',
-            categoryId: '',
-            imageUrls: [''],
-            status: 'AVAILABLE'
-        });
-        setSelectedFiles([]);
-        setPreviews([]);
+        setShowForm(false);
     };
 
     return (
-        <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="max-w-7xl mx-auto px-4 pt-28 pb-12">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
                 <div>
                     <h1 className="text-3xl font-bold text-primary mb-2">{t('dashboard.title')}</h1>
@@ -247,12 +161,49 @@ const Dashboard = ({ user }) => {
                 </button>
             </div>
 
+            {/* Filter Bar */}
+            <div className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-soft mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="relative col-span-1 md:col-span-2">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    <input
+                        type="text"
+                        placeholder={t('common.search_placeholder', { defaultValue: 'Search products...' })}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-none rounded-2xl text-sm font-medium focus:ring-2 focus:ring-black outline-none transition-all"
+                    />
+                </div>
+                
+                <select
+                    value={selectedCategoryId}
+                    onChange={(e) => setSelectedCategoryId(e.target.value)}
+                    className="bg-gray-50 border-none rounded-2xl px-4 py-3.5 text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-black cursor-pointer appearance-none"
+                >
+                    <option value="">{t('common.all_categories', { defaultValue: 'All Categories' })}</option>
+                    {categories.map(cat => (
+                        <option key={cat.id} value={cat.id}>
+                            {t(`categories.${cat.name}`, { defaultValue: cat.name })}
+                        </option>
+                    ))}
+                </select>
+
+                <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="bg-gray-50 border-none rounded-2xl px-4 py-3.5 text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-black cursor-pointer appearance-none"
+                >
+                    <option value="">{t('dashboard.all_status', { defaultValue: 'All Statuses' })}</option>
+                    <option value="AVAILABLE">{t('dashboard.status_available', { defaultValue: 'Available' })}</option>
+                    <option value="SOLD">{t('dashboard.status_sold', { defaultValue: 'Sold' })}</option>
+                </select>
+            </div>
+
             {loading ? (
                 <div className="py-20 text-center text-gray-400">{t('common.loading')}</div>
             ) : products.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {products.map((p) => (
-                        <div key={p.id} className={`bg-white border border-gray-100 rounded-3xl p-6 flex flex-col shadow-soft transition-all ${p.status === 'SOLD' ? 'grayscale opacity-75 bg-gray-50' : ''}`}>
+                        <div key={p.id} className={`bg-white border border-gray-100 rounded-3xl p-6 flex flex-col h-full shadow-soft transition-all ${p.status === 'SOLD' ? 'grayscale opacity-75 bg-gray-50' : ''}`}>
                             <div className="flex gap-4 mb-6">
                                 <div className="w-24 h-24 rounded-2xl overflow-hidden bg-gray-50 flex-shrink-0 relative">
                                     <img
@@ -325,142 +276,43 @@ const Dashboard = ({ user }) => {
                 </div>
             )}
 
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-6 mt-12 pb-10 border-t border-gray-100 pt-10">
+                    <button
+                        disabled={currentPage === 0}
+                        onClick={() => { setCurrentPage(p => p - 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                        className="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-black hover:border-black disabled:opacity-30 disabled:hover:border-gray-200 disabled:hover:text-gray-400 transition-colors"
+                    >
+                        <ChevronLeft size={20} />
+                    </button>
+
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold uppercase tracking-widest text-black">Page {currentPage + 1}</span>
+                        <span className="text-sm font-bold uppercase tracking-widest text-gray-300">of {totalPages}</span>
+                    </div>
+
+                    <button
+                        disabled={currentPage === totalPages - 1}
+                        onClick={() => { setCurrentPage(p => p + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                        className="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-black hover:border-black disabled:opacity-30 disabled:hover:border-gray-200 disabled:hover:text-gray-400 transition-colors"
+                    >
+                        <ChevronRight size={20} />
+                    </button>
+                </div>
+            )}
+
             {/* Form Modal */}
             {showForm && (
-                <div className="modal-overlay" onClick={() => setShowForm(false)}>
-                    <div className="modal-content !max-w-2xl p-8" onClick={e => e.stopPropagation()}>
-                        <div className="flex items-center justify-between mb-8">
-                            <h2 className="text-2xl font-bold">{editingProduct ? t('dashboard.edit_product') : t('dashboard.add_new')}</h2>
-                            <button onClick={() => setShowForm(false)} className="p-2 hover:bg-gray-100 rounded-full">
-                                <X size={24} />
-                            </button>
-                        </div>
-
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            <div className="grid grid-cols-2 gap-6">
-                                <div className="space-y-2 col-span-2">
-                                    <label className="text-xs font-bold uppercase tracking-widest text-gray-400">{t('dashboard.product_title')}</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        className="w-full px-4 py-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-black"
-                                        value={formData.title}
-                                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                    />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold uppercase tracking-widest text-gray-400">
-                                        {t('dashboard.product_price')} (VNĐ)
-                                    </label>
-                                    <input
-                                        type="number"
-                                        required
-                                        className="w-full px-4 py-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-black"
-                                        value={formData.price}
-                                        onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                                    />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold uppercase tracking-widest text-gray-400">{t('dashboard.product_category')}</label>
-                                    <select
-                                        required
-                                        className="w-full px-4 py-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-black appearance-none"
-                                        value={formData.categoryId}
-                                        onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                                    >
-                                        <option value="">{t('dashboard.select_category', { defaultValue: 'Select Category' })}</option>
-                                        {categories.map(c => <option key={c.id} value={c.id}>{t(`categories.${c.name}`, { defaultValue: c.name })}</option>)}
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold uppercase tracking-widest text-gray-400">{t('dashboard.product_condition')}</label>
-                                <div className="flex gap-3">
-                                    {['NEW', 'LIKE_NEW', 'USED'].map(status => (
-                                        <button
-                                            key={status}
-                                            type="button"
-                                            onClick={() => setFormData({ ...formData, conditionStatus: status })}
-                                            className={`flex-1 py-3 rounded-xl text-sm font-bold border transition-all ${formData.conditionStatus === status
-                                                ? 'bg-black text-white border-black'
-                                                : 'bg-white text-gray-500 border-gray-100 hover:border-gray-300'
-                                                }`}
-                                        >
-                                            {t(`conditions.${status}`, { defaultValue: status.replace('_', ' ') })}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold uppercase tracking-widest text-gray-400">{t('dashboard.product_description')}</label>
-                                <textarea
-                                    className="w-full px-4 py-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-black min-h-[120px]"
-                                    value={formData.description}
-                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                />
-                            </div>
-
-                            <div className="space-y-4">
-                                <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block">
-                                    {t('dashboard.product_images')}
-                                </label>
-                                <div className="grid grid-cols-4 gap-4">
-                                    {previews.map((preview, index) => (
-                                        <div key={index} className="relative aspect-square rounded-2xl overflow-hidden bg-gray-100 group">
-                                            <img src={preview} className="w-full h-full object-cover" />
-                                            <button
-                                                type="button"
-                                                onClick={() => removeFile(index)}
-                                                className="absolute top-1 right-1 p-1 bg-white/90 rounded-full text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                                            >
-                                                <X size={14} />
-                                            </button>
-                                        </div>
-                                    ))}
-                                    {compressing ? (
-                                        <label className="aspect-square rounded-2xl border-2 border-dashed border-yellow-300 bg-yellow-50 flex flex-col items-center justify-center">
-                                            <div className="w-5 h-5 border-2 border-yellow-400/40 border-t-yellow-500 rounded-full animate-spin mb-1" />
-                                            <span className="text-[10px] font-bold text-yellow-500">Đang nén...</span>
-                                        </label>
-                                    ) : selectedFiles.length < MAX_IMAGES ? (
-                                        <label className="aspect-square rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center cursor-pointer hover:border-black transition-colors group">
-                                            <ImageIcon className="text-gray-300 group-hover:text-black transition-colors" size={24} />
-                                            <span className="text-[10px] font-bold text-gray-400 group-hover:text-black mt-2">{t('dashboard.upload')}</span>
-                                            <input
-                                                type="file"
-                                                multiple
-                                                accept="image/*"
-                                                className="hidden"
-                                                onChange={handleFileChange}
-                                            />
-                                        </label>
-                                    ) : null}
-                                </div>
-                                <p className="text-[10px] text-gray-400 italic">Tối đa {MAX_IMAGES} ảnh • ảnh được nén tự động trước khi upload</p>
-                            </div>
-
-                            <button
-                                type="submit"
-                                disabled={submitting || compressing}
-                                className={`w-full bg-black text-white py-5 rounded-3xl font-bold text-lg transition-all shadow-xl shadow-black/10 mt-4 flex items-center justify-center gap-2 ${submitting || compressing ? 'opacity-70 cursor-not-allowed' : 'hover:bg-gray-800'
-                                    }`}
-                            >
-                                {submitting ? (
-                                    <>
-                                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        <span>{t('common.processing', { defaultValue: 'Processing...' })}</span>
-                                    </>
-                                ) : (
-                                    editingProduct ? t('dashboard.save_changes') : t('dashboard.create_listing')
-                                )}
-                            </button>
-                        </form>
-                    </div>
-                </div>
+                <ProductForm 
+                    product={editingProduct}
+                    categories={categories}
+                    onSuccess={() => {
+                        resetForm();
+                        fetchAllData();
+                    }}
+                    onCancel={() => resetForm()}
+                />
             )}
         </div>
     );

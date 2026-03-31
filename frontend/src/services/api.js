@@ -7,7 +7,8 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem('token');
     if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+        // Đảm bảo không có khoảng trắng thừa (vấn đề hay gặp trên mobile)
+        config.headers.Authorization = `Bearer ${token.trim()}`;
     }
     return config;
 });
@@ -24,10 +25,30 @@ const CACHE_TTL = 60_000;
 
 api.interceptors.response.use((response) => {
     const url = response.config.url + (response.config.params ? JSON.stringify(response.config.params) : '');
-    if (response.config.method === 'get') {
+    const method = response.config.method.toLowerCase();
+    
+    if (method === 'get') {
         cache.set(url, { data: response.data, ts: Date.now() });
+    } else if (['post', 'put', 'delete'].includes(method)) {
+        // Clear entire cache on any mutation to ensure fresh data
+        cache.clear();
+        console.log('Cache cleared due to mutation');
     }
     return response;
+}, (error) => {
+    // Nếu gặp lỗi 401 (Hết hạn/Chưa đăng nhập) hoặc 403 (Không đủ quyền)
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+        // Xóa thông tin cũ
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        
+        // Chuyển hướng về trang login nếu không phải đang ở đó
+        // Thêm tham số expired=true để trang login có thể hiển thị thông báo "Phiên hết hạn"
+        if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/register')) {
+            window.location.href = '/login?expired=true';
+        }
+    }
+    return Promise.reject(error);
 });
 
 api.interceptors.request.use((config) => {
@@ -49,10 +70,13 @@ api.interceptors.request.use((config) => {
 });
 
 export const productService = {
-    getAll: (categoryId, search) => {
+    getAll: (categoryId, search, status, page, size) => {
         const params = {};
         if (categoryId) params.categoryId = categoryId;
         if (search) params.search = search;
+        if (status) params.status = status;
+        if (page !== undefined) params.page = page;
+        if (size !== undefined) params.size = size;
         return api.get('/products', { params });
     },
     getFeatured: () => api.get('/products/featured'),

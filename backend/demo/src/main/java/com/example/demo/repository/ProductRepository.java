@@ -5,25 +5,28 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
-public interface ProductRepository extends JpaRepository<Product, Long> {
+public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
     @EntityGraph(attributePaths = { "seller", "category", "images" })
-    List<Product> findAll();
+    Page<Product> findAll(Pageable pageable);
 
     @EntityGraph(attributePaths = { "seller", "category", "images" })
     List<Product> findTop4ByOrderByIdDesc();
 
     @EntityGraph(attributePaths = { "seller", "category", "images" })
-    List<Product> findByCategoryId(Long categoryId);
+    Page<Product> findByCategoryId(Long categoryId, Pageable pageable);
 
     @EntityGraph(attributePaths = { "seller", "category", "images" })
-    List<Product> findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String title, String description);
+    Page<Product> findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String title, String description, Pageable pageable);
 
     @EntityGraph(attributePaths = { "seller", "category", "images" })
-    List<Product> findByCategoryIdAndTitleContainingIgnoreCaseOrCategoryIdAndDescriptionContainingIgnoreCase(
-            Long catId1, String title, Long catId2, String description);
+    Page<Product> findByCategoryIdAndTitleContainingIgnoreCaseOrCategoryIdAndDescriptionContainingIgnoreCase(
+            Long catId1, String title, Long catId2, String description, Pageable pageable);
 
     @Modifying
     @Transactional

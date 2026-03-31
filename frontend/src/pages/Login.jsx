@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { authService } from '../services/api';
 import { Mail, Lock, User, ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,8 @@ const Login = ({ onLogin }) => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const isExpired = searchParams.get('expired') === 'true';
     const { t } = useTranslation();
 
     const handleSubmit = async (e) => {
@@ -38,6 +40,12 @@ const Login = ({ onLogin }) => {
                     {error && (
                         <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-2xl text-sm font-medium">
                             {error}
+                        </div>
+                    )}
+
+                    {isExpired && !error && (
+                        <div className="mb-6 p-4 bg-amber-50 text-amber-700 rounded-2xl text-sm font-medium border border-amber-100">
+                            {t('auth.session_expired', { defaultValue: 'Phiên làm việc của bạn đã hết hạn. Vui lòng đăng nhập lại.' })}
                         </div>
                     )}
 

@@ -31,4 +31,5 @@ public class ProductRequest {
 
     private Product.Status status;
     private List<String> imageUrls;
+    private String size;
 }

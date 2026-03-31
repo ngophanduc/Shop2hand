@@ -10,6 +10,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.jpa.domain.Specification;
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -34,23 +39,45 @@ public class ProductService {
     @Autowired
     private CloudinaryService cloudinaryService;
 
-    public List<ProductResponse> getAllProducts(Long categoryId, String search) {
-        List<Product> products;
-        boolean hasSearch = search != null && !search.trim().isEmpty();
+    @Autowired
+    private BroadcasterService broadcasterService;
 
-        if (categoryId != null && hasSearch) {
-            products = productRepository
-                    .findByCategoryIdAndTitleContainingIgnoreCaseOrCategoryIdAndDescriptionContainingIgnoreCase(
-                            categoryId, search, categoryId, search);
-        } else if (categoryId != null) {
-            products = productRepository.findByCategoryId(categoryId);
-        } else if (hasSearch) {
-            products = productRepository.findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(search,
-                    search);
-        } else {
-            products = productRepository.findAll();
-        }
-        return products.stream().map(this::mapToResponse).collect(Collectors.toList());
+    public Page<ProductResponse> getAllProducts(Long categoryId, String search, String status, Pageable pageable) {
+        Specification<Product> spec = buildSpecification(categoryId, search, status);
+        return productRepository.findAll(spec, pageable).map(this::mapToResponse);
+    }
+
+    public List<ProductResponse> getAllProductsList(Long categoryId, String search, String status) {
+        Specification<Product> spec = buildSpecification(categoryId, search, status);
+        return productRepository.findAll(spec).stream().map(this::mapToResponse).collect(Collectors.toList());
+    }
+
+    private Specification<Product> buildSpecification(Long categoryId, String search, String status) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (categoryId != null) {
+                predicates.add(cb.equal(root.get("category").get("id"), categoryId));
+            }
+
+            if (search != null && !search.trim().isEmpty()) {
+                String searchPattern = "%" + search.trim().toLowerCase() + "%";
+                Predicate titlePredicate = cb.like(cb.lower(root.get("title")), searchPattern);
+                Predicate descPredicate = cb.like(cb.lower(root.get("description")), searchPattern);
+                predicates.add(cb.or(titlePredicate, descPredicate));
+            }
+
+            if (status != null && !status.trim().isEmpty()) {
+                try {
+                    Product.Status productStatus = Product.Status.valueOf(status.trim().toUpperCase());
+                    predicates.add(cb.equal(root.get("status"), productStatus));
+                } catch (IllegalArgumentException e) {
+                    // Ignore invalid status
+                }
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
     }
 
     public List<ProductResponse> getFeaturedProducts() {
@@ -86,6 +113,7 @@ public class ProductService {
                 .status(Product.Status.AVAILABLE)
                 .seller(seller)
                 .category(category)
+                .size(request.getSize())
                 .build();
 
         product = productRepository.save(product);
@@ -114,6 +142,7 @@ public class ProductService {
             }
         }
 
+        broadcasterService.broadcast("PRODUCT_UPDATE");
         return mapToResponse(product);
     }
 
@@ -133,6 +162,7 @@ public class ProductService {
         if (request.getStatus() != null) {
             product.setStatus(request.getStatus());
         }
+        product.setSize(request.getSize());
 
         if (request.getCategoryId() != null) {
             Category category = categoryRepository.findById(request.getCategoryId())
@@ -171,7 +201,9 @@ public class ProductService {
             }
         }
 
-        return mapToResponse(productRepository.save(product));
+        Product updatedProduct = productRepository.save(product);
+        broadcasterService.broadcast("PRODUCT_UPDATE");
+        return mapToResponse(updatedProduct);
     }
 
     @Transactional
@@ -203,6 +235,7 @@ public class ProductService {
                 .imageUrls(product.getImages() != null
                         ? product.getImages().stream().map(ProductImage::getImageUrl).collect(Collectors.toList())
                         : List.of())
+                .size(product.getSize())
                 .createdAt(product.getCreatedAt().toString())
                 .build();
     }
