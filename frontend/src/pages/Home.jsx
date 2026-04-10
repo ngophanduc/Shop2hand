@@ -4,12 +4,20 @@ import { productService } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import vintageImg from '../assets/AboutUs/LookbookGallery/3293ec6085cd0b9352dc.jpg';
-import streetwearImg from '../assets/AboutUs/LookbookGallery/d21f43ec3941b71fee50.jpg';
-import storyImg from '../assets/AboutUs/HeroSection/9902a5df1e73902dc962.jpg';
-const images = import.meta.glob('../assets/AboutUs/CTASection/*.{png,jpg,jpeg,svg,webp,PNG,JPG,JPEG,SVG,WEBP}', { eager: true });
-const imageUrls = Object.values(images).map((module) => module.default);
-const heroBgImage = imageUrls.length > 0 ? imageUrls[0] : 'https://images.unsplash.com/photo-1528650017409-90696eb64fcd?w=1600&q=80';
+ 
+// Dynamic imports for the categories and story sections
+const lookbookImages = import.meta.glob('../assets/AboutUs/LookbookGallery/*.{png,jpg,jpeg,svg,webp,PNG,JPG,JPEG,SVG,WEBP}', { eager: true });
+const lookbookUrls = Object.values(lookbookImages).map((module) => module.default);
+const vintageImg = lookbookUrls.length > 0 ? lookbookUrls[0] : '';
+const streetwearImg = lookbookUrls.length > 1 ? lookbookUrls[1] : '';
+ 
+const heroImages = import.meta.glob('../assets/AboutUs/HeroSection/*.{png,jpg,jpeg,svg,webp,PNG,JPG,JPEG,SVG,WEBP}', { eager: true });
+const heroUrls = Object.values(heroImages).map((module) => module.default);
+const storyImg = heroUrls.length > 0 ? heroUrls[0] : '';
+ 
+const ctaImages = import.meta.glob('../assets/AboutUs/CTASection/*.{png,jpg,jpeg,svg,webp,PNG,JPG,JPEG,SVG,WEBP}', { eager: true });
+const ctaUrls = Object.values(ctaImages).map((module) => module.default);
+const heroBgImage = ctaUrls.length > 0 ? ctaUrls[0] : 'https://images.unsplash.com/photo-1528650017409-90696eb64fcd?w=1600&q=80';
 
 const Home = () => {
     const [featured, setFeatured] = useState([]);

@@ -21,22 +21,35 @@ const ProductForm = ({ product, categories: initialCategories, onSuccess, onCanc
         size: product?.size || ''
     });
 
-    const MAX_IMAGES = 5;
+    const MAX_IMAGES = 10;
     const MAX_WIDTH = 1280;
     const JPEG_QUALITY = 0.82;
-    const SHOE_SIZES = ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45'];
+    const SHOE_SIZES = ['35', '35.5', '36', '36.5', '37', '37.5', '38', '38.5', '39', '39.5', '40', '40.5', '41', '41.5', '42', '42.5', '43', '43.5', '44', '44.5', '45', '45.5'];
     const CLOTHING_SIZES = ['XS', 'S', 'M', 'L', 'XL'];
 
     useEffect(() => {
         if (!initialCategories || initialCategories.length === 0) {
             fetchCategories();
+        } else {
+            setCategories(initialCategories);
         }
     }, [initialCategories]);
+
+    useEffect(() => {
+        // Set default category to 'Shoes' if it's a new product and no category is selected
+        if (!product && !formData.categoryId && categories.length > 0) {
+            const shoesCat = categories.find(c => c.name === 'Shoes');
+            if (shoesCat) {
+                setFormData(prev => ({ ...prev, categoryId: shoesCat.id }));
+            }
+        }
+    }, [categories, product]);
 
     const fetchCategories = async () => {
         try {
             const res = await categoryService.getAll();
-            setCategories(Array.isArray(res.data) ? res.data : []);
+            const cats = Array.isArray(res.data) ? res.data : [];
+            setCategories(cats);
         } catch (error) {
             console.error('Error fetching categories', error);
         }

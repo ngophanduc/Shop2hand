@@ -236,7 +236,7 @@ public class ProductService {
                         ? product.getImages().stream().map(ProductImage::getImageUrl).collect(Collectors.toList())
                         : List.of())
                 .size(product.getSize())
-                .createdAt(product.getCreatedAt().toString())
+                .createdAt(product.getCreatedAt() != null ? product.getCreatedAt().toString() : "")
                 .build();
     }
 }

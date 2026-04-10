@@ -62,7 +62,8 @@ const Navbar = ({ user, onLogout }) => {
                         <img 
                             src={logo} 
                             alt="Logo" 
-                            className="w-10 h-10 rounded-xl object-cover group-hover:scale-110 transition-transform duration-300 shadow-md"
+                            className="w-11 h-11 rounded-xl object-contain group-hover:scale-110 transition-transform duration-300 shadow-sm"
+                            style={{ imageRendering: 'high-quality' }}
                         />
                         <span className={`font-bold text-xl tracking-tight hidden sm:block transition-colors ${isDarkBackground ? 'text-white' : 'text-black'}`}>passgiay</span>
                     </Link>
@@ -161,7 +162,12 @@ const Navbar = ({ user, onLogout }) => {
             <div className={`fixed inset-y-0 left-0 h-screen w-[85vw] max-w-[300px] bg-white z-[60] transform transition-transform duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] md:hidden flex flex-col shadow-2xl ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="flex items-center justify-between p-6 border-b border-gray-100">
                     <div className="flex items-center gap-3">
-                        <img src={logo} alt="Logo" className="w-10 h-10 rounded-xl object-cover" />
+                        <img 
+                            src={logo} 
+                            alt="Logo" 
+                            className="w-11 h-11 rounded-xl object-contain shadow-sm" 
+                            style={{ imageRendering: 'high-quality' }}
+                        />
                         <span className="font-bold text-xl tracking-tight text-black">Passgiay</span>
                     </div>
                     <button
